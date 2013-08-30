@@ -75,7 +75,7 @@ func (iv *ImageValidation) Validate(pi *ProfileImage) error {
 // If minimum size is not reached, bailout
 var validateMinimumSize = ImageValidation{
     Condition: func(w, h int) bool{
-        return w <= MinSize && h <= MinSize
+        return w < MinSize || h < MinSize
     },
 
     F: func(im *ProfileImage) (*image.Image, error) {
