@@ -62,6 +62,22 @@ func fromFile(path string) io.Reader {
     return f
 }
 
+func getWriter() (w io.Writer) {
+    var fileErr error
+
+    switch out {
+    case ":bin":
+        w = os.Stdout
+
+    default:
+        if w, fileErr = os.Create(out); fileErr != nil {
+            log.Panicf("%v", fileErr)
+        }
+    }
+
+    return w
+}
+
 func main() {
     var (
         r io.Reader
@@ -75,7 +91,7 @@ func main() {
     }
 
     if im, _, err := image.Decode(r); err != nil {
-        log.Print("%v", err)
+        log.Printf("%v", err)
         os.Exit(3)
     } else {
         pi, imErr := avatar.MakeProfileImage(im, MinSize)
@@ -85,11 +101,7 @@ func main() {
             os.Exit(-1)
         }
 
-        var fileErr error
-
-        if w, fileErr = os.Create(out); fileErr != nil {
-            log.Panicf("%v", fileErr)
-        }
+        w = getWriter()
 
         if saveErr := pi.Save(w); saveErr != nil {
             log.Panicf("%v", saveErr)
